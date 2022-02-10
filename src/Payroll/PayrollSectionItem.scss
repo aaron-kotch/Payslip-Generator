@@ -1,0 +1,214 @@
+$primary-font: #333333;
+$secondary-font: #A1A4AB;
+$selected: #efefef;
+$hover: #F8F8F8;
+$border: #E6E7EE;
+$accent: #412BEB;
+
+%row-start {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+%row-end {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+%row-space-between {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+%grid-center {
+    display: grid;
+    place-items: center;
+}
+
+.section-item {
+  
+    overflow: hidden;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: solid $border thin;
+
+    #header-focus {
+        background-color: $accent;
+        color: #ffffff;
+    
+        h1 {
+            color: #ffffff;
+            font-weight: 400;
+        }
+    }
+
+    .section-main {
+
+        @extend %row-space-between;
+        padding: 20px 28px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: $hover;
+        }
+
+        .name-section {
+
+            @extend %row-start;
+            width: 50%;
+           
+            .icon-wrapper {
+                @extend %grid-center;
+                width: 24px;
+                height: 24px;
+                font-size: 12px;
+                margin-right: 24px;
+            }
+    
+            .name-wrapper {
+
+                width: 100%;
+                text-align: left;
+
+                h1 {
+                    font-size: 14px;
+                    color: $primary-font;
+                    font-weight: 500;
+                    letter-spacing: 0.5px;
+                    text-transform: capitalize;
+                }
+            }
+        }
+
+        .section-end {
+    
+            @extend %row-end;
+
+            .inner-end {
+
+                @extend %row-end;
+
+                .pay-section {
+        
+                    text-align: left;
+                    flex: 0 0 160px;
+            
+                    h2 {
+                        font-size: 14px;
+                        color: $primary-font;
+                        font-weight: 400;
+                        letter-spacing: 1px;
+                    }
+            
+                    h5 {
+                        font-size: 10px;
+                        color: $secondary-font;
+                        font-weight: 400;
+                    }
+                }
+            }
+    
+            .expand-button {
+            
+                @extend %grid-center;
+        
+                cursor: pointer;
+                padding: 6px;
+                border-radius: 8px;
+
+                #button-isExpand {
+                    transform: rotate(180deg);
+                    transition: transform 0.25s ease;
+                }
+
+                #button-isCollapsed {
+                    // transform: rotate(-90deg);
+                    transition: transform 0.25s ease;
+                }
+            }
+
+            
+            
+        }
+    
+    }
+
+    .section-data {
+
+        padding: 0 28px;
+        padding-bottom: 32px;
+        // border-bottom: solid $border thin;
+
+        h1 {
+            text-align: left;
+        }
+
+        .deductions {
+            
+            h1 {
+                margin-bottom: 14px;
+            }
+        }
+        
+        .item-section {
+
+            position: relative;
+            margin-top: 36px;
+
+            h1 {
+                font-size: 14px;
+                font-weight: 700;
+                color: $primary-font;
+            }
+
+            h4 {
+                position: absolute;
+                font-size: 12px;
+                font-weight: 600;
+                color: $accent;
+                text-align: left;
+                top: 28px;
+            }
+
+            .section-row {
+
+                @extend %row-start;
+                flex-wrap: 0 1 auto;
+                flex-wrap: wrap;
+
+                #employee {
+                    h6 {
+                        color: $accent;
+                    }
+                }
+
+                .section-column {
+                    flex: 0 0 200px;
+                    text-align: left;
+                    margin-top: 20px;
+
+                    h3 {
+                        font-size: 15px;
+                        font-weight: 400;
+                        letter-spacing: 1px;
+                        color: $primary-font;
+                    }
+
+                    h6 {
+                        font-size: 12px;
+                        font-weight: 400;
+                        letter-spacing: 0.2px;
+                        margin-bottom: 4px;
+                        color: $secondary-font;
+                    }
+                }
+            }
+        }
+    }
+}

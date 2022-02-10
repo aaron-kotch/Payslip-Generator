@@ -1,0 +1,76 @@
+$primary-font: #333333;
+$secondary-font: #A1A4AB;
+$selected: #efefef;
+$hover: #F8F8F8;
+$border: #E6E7EE;
+$accent: #412BEB;
+
+%row-space-between {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+%row-start {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+%column-start {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+%centre {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.payroll-section {
+    
+
+    // border-bottom: solid $border thin;
+    padding-bottom: 16px;
+    // border-right: solid $border thin;
+
+    .section-header {
+        @extend %row-start;
+        padding: 8px 32px;
+        margin-bottom: 16px;
+
+        .divider {
+
+            @extend %column-start;
+
+            margin-right: 40px;
+
+            h3 {
+                text-align: left;
+                font-size: 12px;
+                font-weight: 500;
+                color: $primary-font;
+                letter-spacing: 1px;
+            }
+
+            h4 {
+                text-align: left;
+                font-size: 10px;
+                font-weight: 600;
+                color: $secondary-font;
+                letter-spacing: 0.5px;
+            }
+        }
+    }
+
+    .list-wrapper {
+        margin: 0 32px;
+    }
+    
+}
