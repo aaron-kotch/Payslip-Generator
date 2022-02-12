@@ -1,0 +1,123 @@
+$primary-font: #2c2f32;
+$secondary-font: #A1A4AB;
+$selected: #efefef;
+$hover: #F8F8F8;
+$border: #E6E7EE;
+$accent: #412BEB;
+$background: #fcfcfc;
+
+
+//shared
+%row-space-between {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+%row-start {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+%row-end {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+%centre {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+%column-start {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.large-summary {
+
+    background-color: #fcfcfc;
+    border-left: solid $border thin;
+    width: 468px;
+    height: 100%;
+    overflow: scroll;
+
+    .section-data {
+
+        padding: 0 28px;
+        padding-bottom: 32px;
+        height: 100%;
+
+        h1 {
+            text-align: left;
+        }
+
+        .sub-heading {
+            text-align: left;
+            font-size: 18px;
+            text-transform: capitalize;
+            margin-top: 24px;
+        }
+
+        #salary {
+            margin-top: 20px;
+        }
+
+        .item-section {
+
+            position: relative;
+            margin-top: 36px;
+
+            h1 {
+                font-size: 14px;
+                font-weight: 700;
+                color: $primary-font;
+            }
+
+            h4 {
+                position: absolute;
+                font-size: 12px;
+                font-weight: 600;
+                color: $accent;
+                text-align: left;
+                top: 28px;
+            }
+
+            .section-row {
+
+                @extend %row-start;
+                flex-wrap: 0 1 auto;
+                flex-wrap: wrap;
+
+                .section-column {
+                    flex: 0 0 200px;
+                    text-align: left;
+                    margin-top: 20px;
+
+                    h3 {
+                        font-size: 14px;
+                        font-weight: 400;
+                        letter-spacing: 1px;
+                        color: $primary-font;
+                    }
+
+                    h6 {
+                        font-size: 12px;
+                        font-weight: 400;
+                        letter-spacing: 0.2px;
+                        margin-bottom: 4px;
+                        color: $secondary-font;
+                    }
+                }
+            }
+        }
+    }
+}

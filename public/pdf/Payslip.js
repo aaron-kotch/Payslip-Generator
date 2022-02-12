@@ -1,11 +1,15 @@
 const fs = require('fs');
 const PDFGenerator = require('pdfkit')
 const homeDir = require('os').homedir()
+const path = require('path')
 
 class PaySlipGenerator {
 
-    constructor(staff) {
+    constructor(staff, filepath, month, location) {
         this.staff = staff
+        this.filepath = filepath
+        this.month = month
+        this.location = location
     }
 
     generateHeader(doc) {
@@ -51,7 +55,7 @@ class PaySlipGenerator {
             baseline: 'middle',
             width: 54.4
         })
-        .text(`:  ${(this.staff['epf-no'])}`, 400, 84.9, {
+        .text(`: ${(this.staff['epf-no'])}`, 400, 84.9, {
             align: 'left',
             baseline: 'middle',
             width: 168.1
@@ -542,12 +546,25 @@ class PaySlipGenerator {
             margin: 0
         })
 
-        output.pipe(fs.createWriteStream(`${homeDir}/Desktop/test-payslip.pdf`))
+        const outputPath = `${path.join(this.filepath, this.month, this.location)}`
+
+        if (!fs.existsSync(outputPath)) {
+            fs.mkdirSync(outputPath, {recursive: true}, (err) => {
+                if (err) {
+                    return console.error(err)
+                }
+                console.log("DIRECTORY CREATED")
+            })
+        }
+
+        output.pipe(fs.createWriteStream(`${outputPath}/${this.staff['name']} ${this.staff['ic-no']}.pdf`))
 
         this.generateHeader(output)
         this.generateTable(output)
     
         output.end()
+
+        console.log(`${this.staff.name} Payslip printed.`)
     
     }
     

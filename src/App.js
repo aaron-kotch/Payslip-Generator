@@ -1,34 +1,44 @@
 import './App.scss';
+import { useState } from 'react';
 import PayrollView from './Payroll/PayrollView'
-import { FiBox, FiCode, FiChevronRight } from 'react-icons/fi';
+import { FiBox, FiMoon, FiSun, FiChevronRight } from 'react-icons/fi';
 
 function App() {
+
+  const [isDarkMode, setDarkMode] = useState(false);
+
   return (
-    <div className="App">
+    <div className={isDarkMode ? "dark-theme" : "light-theme"}>
+      <div className="App">
       
-      <div className='menu-panel'>
+        <div className={isDarkMode ? "menu-panel menu-panel-dark" : "menu-panel"}>
 
-        <div className='menu-top'>
+          <div className='menu-top'>
 
-          <div className='icon-wrapper' id='menu-selected'>
-            <FiBox/>
+            <div className='icon-wrapper' id='menu-selected'>
+              <FiBox/>
+            </div>
+
+            {/* <div className='icon-wrapper' id='menu-unselected' onClick={() => setDarkMode(!isDarkMode)}>
+              { isDarkMode
+                ? <FiMoon/>
+                : <FiSun/>
+              }
+            </div> */}
+            
           </div>
 
-          <div className='icon-wrapper' id='menu-unselected'>
-            <FiCode/>
+          <div className='button-wrapper'>
+            <FiChevronRight/>
           </div>
+
         </div>
 
-        <div className='button-wrapper'>
-          <FiChevronRight/>
+        <div className='main-panel'>
+          <PayrollView/>
         </div>
 
       </div>
-
-      <div className='main-panel'>
-        <PayrollView/>
-      </div>
-
     </div>
   );
 }

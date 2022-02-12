@@ -1,97 +1,110 @@
-$primary-font: #2c2f32;
-$secondary-font: #868b90;
-$selected: #efefef;
-$hover: #F6F8FA;
-$border: #E6E7EE;
-$accent: #412BEB;
+@mixin themable($theme-name, $background-color, $color, $primary-font, $secondary-font, $selected, $hover, $border, $accent) {
+    .#{$theme-name} {
 
-h6 {
-    font-size: 12px;
-    font-weight: 600;
-}
-
-//shared
-%column-shared {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    
-}
-
-%row-shared {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-%centre-shared {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.App {
-    text-align: center;
-    background-color: #fcfcfc;
-}
-
-.menu-panel {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 64px;
-    height: 100vh;
-    border-right: solid $border thin;
-    padding: 16px 0;
-
-    .menu-top {
-        
-        .icon-wrapper {
-            @extend %centre-shared;
-
-            width: 40px;
-            height: 40px;
-            border: none;
-            border-radius: 50%;
-            margin-bottom: 12px;
-            box-shadow: 0 0 1px transparent;
-            font-size: 18px;
+        h6 {
+            font-size: 12px;
+            font-weight: 600;
         }
         
-        #menu-selected {
-            color: $accent;
+        //shared
+        %column-shared {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            
         }
         
-        #menu-unselected {
-            color: $secondary-font;
+        %row-shared {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        
+        %centre-shared {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-            &:hover {
-                color: $accent;
+        .App {
+            text-align: center;
+            background-color: $background-color;
+            
+        }
+        
+        .menu-panel-dark {
+            border-right: solid $accent thin;
+        }
+
+        .menu-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 64px;
+            height: 100vh;
+            border-right: solid $border thin;
+            padding: 16px 0;
+        
+            .menu-top {
+                
+                .icon-wrapper {
+                    @extend %centre-shared;
+        
+                    cursor: pointer;
+                    width: 40px;
+                    height: 40px;
+                    border: none;
+                    border-radius: 50%;
+                    margin-bottom: 12px;
+                    box-shadow: 0 0 1px transparent;
+                   
+                }
+                
+                #menu-selected {
+                    color: $accent;
+                }
+                
+                #menu-unselected {
+                    color: $color;
+        
+                    &:hover {
+                        color: $accent;
+                    }
+                }
+            }
+        
+            .button-wrapper {
+        
+                @extend %centre-shared;
+        
+                cursor: pointer;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                color: $color;
+        
+                &:hover {
+                    background-color: $hover;
+                }
+            }
+        }
+        
+        .main-panel {
+            height: 100vh;
+            margin-left: 64px;
+            background-color: $background-color;
+        
+            &::-webkit-scrollbar-track {
+                border-radius: 50px;
             }
         }
     }
-
-    .button-wrapper {
-
-        @extend %centre-shared;
-
-        cursor: pointer;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-
-        &:hover {
-            background-color: $hover;
-        }
-    }
 }
 
-.main-panel {
-    height: 100vh;
-    margin-left: 65px;
-}
+@include themable(light-theme, #fcfcfc, #2c2f32, #2c2f32, #868b90, #efefef, #F6F8FA, #E6E7EE, #412BEB);
+@include themable(dark-theme, #151718, #ffffff, #57585E, #868b90, #efefef, #F6F8FA, #2c2f32, #412BEB);

@@ -4,6 +4,8 @@ $selected: #efefef;
 $hover: #F8F8F8;
 $border: #E6E7EE;
 $accent: #412BEB;
+$background: #fcfcfc;
+
 
 //shared
 %row-space-between {
@@ -36,8 +38,14 @@ $accent: #412BEB;
 %column-start {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+@media only screen and (min-width: 1201px) {
+        .payroll-view {
+            margin-right: 468px;
+        }
 }
 
 //view
@@ -214,11 +222,25 @@ $accent: #412BEB;
             width: 100%;
             padding: 0 32px;
             margin-bottom: 4px;
+
+            .hide-scroll-wrapper {
+                height: 37px;
+                overflow-y: hidden;
+                width: 100%;
+            }
+
+            .scrollbar-hide {
+                padding-bottom: 37px;
+            }
     
             .tab-wrapper {
     
                 @extend %row-start;
                 position: relative;
+                width: 90%;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scroll-behavior: smooth;
     
                 .tab-item {
     
@@ -272,36 +294,24 @@ $accent: #412BEB;
                 }
             }
     
-            .row {
+            .generate-button {
+        
+                @extend %centre;
+
+                cursor: pointer;
+                background-color: $accent;
+                color: #fff;
+                padding: 10px 14px;
+                border-radius: 6px;
+                font-size: 14px;
+                height: 37px;
+                width: 180px;
     
-                @extend %row-start;
-    
-                .icon-button {
-    
-                    @extend %centre;
-                    margin-right: 10px;
-                    font-size: 14px;
-                    padding: 10px;
-                    border-radius: 8px;
-                    color: $secondary-font;
-        
-                }
-        
-                .import-button {
-        
-                    @extend %row-start;
-                    cursor: pointer;
-                    background-color: $accent;
-                    color: #fff;
-                    padding: 10px 14px;
-                    border-radius: 6px;
-                    font-size: 14px;
-        
-                    h6 {
-                        margin-left: 8px;
-                        font-weight: 400;
-                        font-size: 12px;
-                    }
+                h6 {
+                    margin-left: 8px;
+                    font-weight: 400;
+                    font-size: 12px;
+                    overflow: hidden
                 }
             }
     
@@ -349,7 +359,276 @@ $accent: #412BEB;
     
         }
 
+        .large-summary {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100%;
+        }
+
+        .generate-payslip-wrapper {
+            
+            @extend %centre;
+    
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            background: #00000070;
+            z-index: 1;
+            
+            .generate-payslip-box {
+    
+                @extend %column-start;
+        
+                max-width: 500px;
+                background-color: $background;
+                border-radius: 8px;
+                padding: 24px 32px;
+                box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        
+                h2 {
+                    text-align: left;
+                    font-size: 18px;
+                    font-weight: 700;
+                    margin-bottom: 24px;
+                }
+        
+                h3 {
+                    text-align: left;
+                    color: $secondary-font;
+                    font-weight: 600;
+                    margin-bottom: 6px;
+                    font-size: 14px
+                }
+        
+                .output-wrapper {
+        
+                    @extend %row-space-between;
+
+                    width: 100%;
+                    margin-bottom: 8px;
+
+                    p {
+                        font-weight: 400;
+                        font-size: 12px;
+                        text-align: left;
+                        letter-spacing: 0.25px
+                    }
+
+                    .choose-button {
+
+                        @extend %centre;
+
+                        cursor: pointer;
+                        background-color: #ECE9FD;
+                        border-radius: 4px;
+                        margin-left: 24px;
+                        width: 160px;
+                        padding: 8px 0;
+                        
+
+                        h4 {
+                            font-size: 12px;
+                            font-weight: 700;
+                            color: $accent;
+                            letter-spacing: 0.6px;
+                        }
+                    }
+                }
+
+                .actions-row {
+
+                    @extend %row-end;
+
+                    width: 100%;
+                    margin-top: 40px;
+
+                    .button {
+                        
+                        @extend %centre;
+
+                        cursor: pointer;
+                        padding: 8px 16px;
+                        border-radius: 4px;
+                        margin-left: 8px;
+
+                        h4 {
+                            font-size: 12px;
+                            font-weight: 500;
+                        }
+                        
+                    }
+
+                    .cancel-button {
+                        background-color: #EEF1F7;
+
+                        &:hover {
+                            background-color: #D6D8DE;
+                        }
+                    }
+
+                    .confirm-button {
+                        background-color: $accent;
+                        
+                        h4 {
+                            color: #fff;
+                        }
+                    }
+
+                }
+
+                .loading-wrapper {
+
+                    @extend %column-start;
+
+                    width: 100%;
+
+                    .loading-title {
+
+                        @extend %centre;
+
+                        width: 100%;
+
+                        .loading-icon {
+                        
+                            @extend %centre;
+    
+                            color: $accent;
+                            font-size: 16px;
+                            margin-left: 12px;
+                        }
+    
+                        h5 {
+                            font-size: 16px;
+                            font-weight: 600;
+                            letter-spacing: 0.2px
+                        }
+                    }
+
+                    .bar-wrapper {
+
+                        @extend %row-start;
+                        
+                        width: 100%;
+                        height: 4px;
+                        margin-top: 16px;
+                        margin-bottom: 8px;
+                        border-radius: 2px;
+                        background-color: $selected;
+                    }
+                }
+
+                .completed-wrapper {
+
+                    @extend %centre;
+                    flex-direction: column;
+                    width: 100%;
+
+                    .completed-icon {
+                        
+                        @extend %centre;
+
+                        width: 32px;
+                        height: 32px;
+                        color: #468F17;
+                        font-size: 24px;
+                        margin-bottom: 12px;
+                    }
+
+                    h5 {
+                        font-size: 16px;
+                        font-weight: 700;
+                    }
+
+                    p {
+                        margin-top: 4px;
+                        font-size: 12px;
+                        font-weight: 500;
+                        width: 240px;
+                    }
+
+                    .actions-complete {
+
+                        @extend %centre;
+    
+                        width: 100%;
+                        margin-top: 32px;
+    
+                        .button {
+                            
+                            @extend %centre;
+    
+                            cursor: pointer;
+                            padding: 8px 0;
+                            width: 80px;
+                            border-radius: 4px;
+                            margin: 0 4px;
+
+                            h4 {
+                                font-size: 12px;
+                                font-weight: 500;
+                            }
+                            
+                        }
+    
+                        .cancel-button {
+                            background-color: #EEF1F7;
+    
+                            &:hover {
+                                background-color: #D6D8DE;
+                            }
+                        }
+    
+                        .confirm-button {
+                            background-color: $accent;
+                            
+                            h4 {
+                                color: #fff;
+                            }
+                        }
+    
+                    }
+                }
+
+                @media (prefers-reduced-motion: no-preference) {
+                    .loading-icon {
+                        animation: loading-icon-spin infinite 1.2s linear;
+                    }
+                }
+                
+                @keyframes loading-icon-spin {
+                    from {
+                        transform: rotate(0deg);
+                    } to {
+                        transform: rotate(360deg);
+                    }
+                }
+                
+            }
+        }
+
     }
 
     
+
+    
+    
+}
+
+::-webkit-scrollbar {
+    width: 10px; 
+}
+
+::-webkit-scrollbar-thumb {
+    border: 2px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: 20px;
+    background-color: $secondary-font;
+}
+
+::-webkit-scrollbar-track {
+    background-color: $hover;
+    margin: 4px 0;
 }

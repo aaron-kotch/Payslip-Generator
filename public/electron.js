@@ -1,8 +1,12 @@
 const path = require('path');
 const reader = require('xlsx');
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const homedir = require('os').homedir();
+const fs = require('fs');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const isDev = require('electron-is-dev');
-const PaySlipGenerator = require("./pdf/Payslip")
+const PaySlipGenerator = require("./pdf/Payslip");
+const { execSync } = require('child_process');
+const { electron } = require('process');
 
 function createWindow() {
 
@@ -24,13 +28,13 @@ function createWindow() {
             : `file://${path.join(__dirname, '../build/index.html')}`
     );
 
-    // if (isDev) {
-    //     win.webContents.openDevTools({ mode: 'detach' })
-    // }
+    if (isDev) {
+        win.webContents.openDevTools({ mode: 'detach' })
+    }
 
     win.removeMenu();
 
-    ipcMain.handle('open-file', async () => {
+    ipcMain.handle('open-file', async() => {
 
         let data = {}; //payroll file data
 
@@ -46,13 +50,68 @@ function createWindow() {
         return data;
     });
 
-    ipcMain.handle('generate-payslip', (event, data) => {
+    ipcMain.handle('generate-payslip', async (event, data) => {
 
-        const payslipGenerator = new PaySlipGenerator(data)
+        const payslipGenerator = new PaySlipGenerator(data['data'], data['filepath'], data['month'], data['abv'])
         payslipGenerator.generate()
-        console.log("Payslip printed.")
+
 
     });
+
+    ipcMain.handle('open-folder', async() => {
+
+        let dir = ""
+
+        await dialog.showOpenDialog({
+            properties: ['openDirectory']
+        }).then(result => {
+            if (result.canceled == false) {
+                dir = result.filePaths[0]
+            }
+        })
+
+        return dir;
+    })
+
+    ipcMain.handle('view-folder', async (event, filepath) => {
+
+        let command = '';
+
+        switch (process.platform) {
+            case 'darwin':
+                command = 'open';
+                break;
+            case 'win32':
+                command = 'explore';
+                break;
+            default:
+                command = 'explore';
+                break;
+        }
+
+        shell.openPath(filepath)
+
+        return 0;
+    })
+
+    ipcMain.handle('get-home-dir', () => {
+
+        let defaultDir = path.join(homedir, 'Documents', 'Payslip Generator Output');
+
+        console.log(defaultDir)
+
+        // create new if folder does not exist
+        if (!fs.existsSync(defaultDir)) {
+            fs.mkdir(defaultDir, (err) => {
+                if (err) {
+                    return console.error(err)
+                }
+                console.log("DIRECTORY CREATED")
+            })
+        }  
+
+        return defaultDir;
+    })
 
 
 }
@@ -77,14 +136,16 @@ function readFile(filepath) {
     let payrollList = [];
 
     const file = reader.readFile(filepath); //reads selected file from path
-    const sheets= file.SheetNames; //get sheet names
+    const sheets = file.SheetNames; //get sheet names
+
+    const crewSheet = file.Sheets["CREW CHANGE"];
+    const crewRange = reader.utils.decode_range(crewSheet['!ref']);    
 
     //loops through each sheet names
     sheets.forEach((sheet) => {
 
         //set current sheet
         const ws = file.Sheets[sheet];
-
         const range = reader.utils.decode_range(ws['!ref']);
 
         let textIndex;
@@ -118,52 +179,136 @@ function readFile(filepath) {
 
             //get period
             const periodRaw = (ws[`A${textIndex + 2}`].v).split(" ");
-
             const period = `${periodRaw[1]} TO ${(periodRaw[3]).split(")")[0]}`;
 
             let count = 1;
+            let crewSheetRangeCount
+
+            //get crew sheet valid range
+            for (let i = crewRange.s.r; i < crewRange.e.r; i++) {
+                if (crewSheet[`A${i}`] !== undefined && (crewSheet[`A${i}`].v).toString().toLowerCase().includes("prepared")) {
+                    crewSheetRangeCount = i;
+                }
+            }
 
             for (let i = range.s.r; i < range.e.r; i++) {
 
                 if (ws[`A${i}`] !== undefined && ws[`A${i}`].v == count) {
+
+                    // default values in case of empty cells
+                    let name = "UNSPECIFIED"
+                    let periodCrew = "UNSPECIFIED"
+                    let icNo = "UNSPECIFIED"
+                    let position = "UNSPECIFIED"
+                    let epfNo = "UNSPECIFIED"
+                    let basicRate = "UNSPECIFIED"
+                    let fixedOtRate = "UNSPECIFIED"
+                    let dayRate = "UNSPECIFIED"
+                    let dayCount = "UNSPECIFIED"
+                    let basicPay = "UNSPECIFIED"
+                    let totalOtFixed = "UNSPECIFIED"
+                    let totalOtExceed = "UNSPECIFIED"
+                    let otherPay = "UNSPECIFIED"
+                    let grossPay = "UNSPECIFIED"
+                    let pcb = "UNSPECIFIED"
+                    let cp38 = "UNSPECIFIED"
+                    let employeeEPF = "UNSPECIFIED"
+                    let employeeSOCSO = "UNSPECIFIED"
+                    let employeeEIS = "UNSPECIFIED"
+                    let baitulmal = "UNSPECIFIED"
+                    let otherDeduction = "UNSPECIFIED"
+                    let advanceDeduction = "UNSPECIFIED"
+                    let totalDeduction = "UNSPECIFIED"
+                    let netPay = "UNSPECIFIED"
+                    let employerEPF = "UNSPECIFIED"
+                    let employerSOCSO = "UNSPECIFIED"
+                    let employerEIS = "UNSPECIFIED"
+                    let totalEPF = "UNSPECIFIED"
+                    let totalSOCSO = "UNSPECIFIED"
+                    let totalEIS = "UNSPECIFIED"
+
+                    for (let crewRow = crewRange.s.r; crewRow < crewSheetRangeCount; crewRow++) {
+
+                        if (crewSheet[`B${crewRow}`] !== undefined && ((crewSheet[`B${crewRow}`].v === ws[`B${i}`].v) && (crewSheet[`F${crewRow}`].v == sheet))) {
+                            //console.log(ws[`B${i}`].v + ", ROW " + crewSheet[`F${crewRow}`].v);
+
+                            if (crewSheet[`C${crewRow}`] !== undefined) icNo = crewSheet[`C${crewRow}`].v
+                            if (crewSheet[`D${crewRow}`] !== undefined) epfNo = crewSheet[`D${crewRow}`].v
+                            if (crewSheet[`E${crewRow}`] !== undefined) position = crewSheet[`E${crewRow}`].v
+
+                            break;
+                        }
+                    }
+
+                    if (ws[`B${i}`] !== undefined) name = ws[`B${i}`].v
+                    periodCrew = period
+                    if (ws[`C${i}`] !== undefined) basicRate = parseFloat(ws[`C${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`D${i}`] !== undefined) fixedOtRate = parseFloat(ws[`D${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`E${i}`] !== undefined) dayRate = parseFloat(ws[`E${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`F${i}`] !== undefined) dayCount = parseInt(ws[`F${i}`].v).toLocaleString()
+                    if (ws[`G${i}`] !== undefined) basicPay = parseFloat(ws[`G${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`H${i}`] !== undefined) totalOtFixed = parseFloat(ws[`H${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`I${i}`] !== undefined) totalOtExceed = parseFloat(ws[`I${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`J${i}`] !== undefined) otherPay = parseFloat(ws[`J${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`K${i}`] !== undefined) grossPay = parseFloat(ws[`K${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`L${i}`] !== undefined) pcb = parseFloat(ws[`L${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`M${i}`] !== undefined) cp38 = parseFloat(ws[`M${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                   
+                    if (ws[`N${i}`] !== undefined) employeeEPF = parseFloat(ws[`N${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`O${i}`] !== undefined) employeeSOCSO = parseFloat(ws[`O${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`P${i}`] !== undefined) employeeEIS = parseFloat(ws[`P${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    
+                    if (ws[`Q${i}`] !== undefined) baitulmal = parseFloat(ws[`Q${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`R${i}`] !== undefined) otherDeduction = parseFloat(ws[`R${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`S${i}`] !== undefined) advanceDeduction = parseFloat(ws[`S${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`T${i}`] !== undefined) totalDeduction = parseFloat(ws[`T${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`U${i}`] !== undefined) netPay = parseFloat(ws[`U${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+
+                    if (ws[`V${i}`] !== undefined) employerEPF =  parseFloat(ws[`V${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`W${i}`] !== undefined) employerSOCSO =  parseFloat(ws[`W${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`X${i}`] !== undefined) employerEIS =  parseFloat(ws[`X${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    employerTotal =  (parseFloat(ws[`V${i}`].v.toFixed(2)) + parseFloat(ws[`W${i}`].v.toFixed(2)) + parseFloat(ws[`X${i}`].v.toFixed(2))).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    
+                    if (ws[`Y${i}`] !== undefined) totalEPF = parseFloat(ws[`Y${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`Z${i}`] !== undefined) totalSOCSO = parseFloat(ws[`Z${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    if (ws[`AA${i}`] !== undefined) totalEIS = parseFloat(ws[`AA${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
         
                     data.push({
-                        "name": ws[`B${i}`].v,
-                        "period": period,
-                        "ic-no": " ",
-                        "position": "",
-                        "epf-no": " ",
-                        "position": " ",
-                        "basic-rate": parseFloat(ws[`C${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "fixed-ot-rate": parseFloat(ws[`D${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "day-rate": parseFloat(ws[`E${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "day-count": parseInt(ws[`F${i}`].v).toLocaleString(),
-                        "basic-pay": parseFloat(ws[`G${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "total-ot-fixed": parseFloat(ws[`H${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "total-ot-exceed": parseFloat(ws[`I${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "other-pay": parseFloat(ws[`J${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "gross-pay": parseFloat(ws[`K${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "pcb": parseFloat(ws[`L${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "cp38": parseFloat(ws[`M${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
+                        "name": name,
+                        "period": periodCrew,
+                        "ic-no": icNo,
+                        "epf-no": epfNo,
+                        "position": position,
+                        "basic-rate": basicRate,
+                        "fixed-ot-rate": fixedOtRate,
+                        "day-rate": dayRate,
+                        "day-count": dayCount,
+                        "basic-pay": basicPay,
+                        "total-ot-fixed": totalOtFixed,
+                        "total-ot-exceed": totalOtExceed,
+                        "other-pay": otherPay,
+                        "gross-pay": grossPay,
+                        "pcb": pcb,
+                        "cp38": cp38,
                         "employee": {
-                            "epf": parseFloat(ws[`N${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                            "socso": parseFloat(ws[`O${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                            "eis": parseFloat(ws[`P${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
+                            "epf": employeeEPF,
+                            "socso": employeeSOCSO,
+                            "eis": employeeEIS,
                         },
-                        "baitulmal": parseFloat(ws[`Q${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "other-deduction": parseFloat(ws[`R${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "advance-deduction": parseFloat(ws[`S${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "total-deduction": parseFloat(ws[`T${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "net-pay": parseFloat(ws[`U${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
+                        "baitulmal": baitulmal,
+                        "other-deduction": otherDeduction,
+                        "advance-deduction": advanceDeduction,
+                        "total-deduction": totalDeduction,
+                        "net-pay": netPay,
                         "employer": {
-                            "epf": parseFloat(ws[`V${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                            "socso": parseFloat(ws[`W${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                            "eis": parseFloat(ws[`X${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                            "total": (parseFloat(ws[`V${i}`].v.toFixed(2)) + parseFloat(ws[`W${i}`].v.toFixed(2)) + parseFloat(ws[`X${i}`].v.toFixed(2))).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                            "epf": employerEPF,
+                            "socso": employerSOCSO,
+                            "eis": employerEIS,
+                            "total": employerTotal,
                         },
-                        "total-epf": parseFloat(ws[`Y${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "total-socso": parseFloat(ws[`Z${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                        "total-eis": parseFloat(ws[`AA${i}`].v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
+                        "total-epf": totalEPF,
+                        "total-socso": totalSOCSO,
+                        "total-eis": totalEIS,
                     });
 
                     count++;
@@ -173,9 +318,6 @@ function readFile(filepath) {
             payrollList.push({"name": name, "month": month, "period": period, "abv": sheet, "data": data})
         }
     })
-
-    console.log(payrollList);
-    console.log(payrollList[0]["data"].length);
 
     return payrollList;
 }

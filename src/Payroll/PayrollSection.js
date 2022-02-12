@@ -1,9 +1,14 @@
 import './PayrollSection.scss';
 import PayrollSectionItem from './PayrollSectionItem';
 import { FiPlus } from 'react-icons/fi'
+import { useState } from 'react';
 
 
-const PayrollSection = ({data}) => {
+const PayrollSection = ({data, handleIndex}) => {
+
+    const setCurrentIndex = (index) => {
+        handleIndex(index)
+    }
 
     return (
         <div className='payroll-section'>
@@ -29,7 +34,9 @@ const PayrollSection = ({data}) => {
             <div className='list-wrapper'>
                 { data['data'].length !== 0 &&
                     data['data'].map((item, index) => {
-                        return <PayrollSectionItem key={item['name']} data={item}/>
+                        return <div onClick={() => {setCurrentIndex(index)}}>
+                            <PayrollSectionItem key={item['name']} data={item}/>
+                        </div>
                     })
                 }
             </div>

@@ -5,6 +5,13 @@ $hover: #F8F8F8;
 $border: #E6E7EE;
 $accent: #412BEB;
 
+%column-start {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
 %row-start {
     display: flex;
     flex-direction: row;
@@ -41,6 +48,7 @@ $accent: #412BEB;
     #header-focus {
         background-color: $accent;
         color: #ffffff;
+        
     
         h1 {
             color: #ffffff;
@@ -51,8 +59,14 @@ $accent: #412BEB;
     .section-main {
 
         @extend %row-space-between;
-        padding: 20px 28px;
+        height: 72px;
+        padding: 0 28px;
         cursor: pointer;
+
+        h1 {
+            color: #ffffff;
+            font-weight: 400;
+        }
 
         &:hover {
             background-color: $hover;
@@ -149,13 +163,6 @@ $accent: #412BEB;
             text-align: left;
         }
 
-        .deductions {
-            
-            h1 {
-                margin-bottom: 14px;
-            }
-        }
-        
         .item-section {
 
             position: relative;
@@ -182,19 +189,13 @@ $accent: #412BEB;
                 flex-wrap: 0 1 auto;
                 flex-wrap: wrap;
 
-                #employee {
-                    h6 {
-                        color: $accent;
-                    }
-                }
-
                 .section-column {
                     flex: 0 0 200px;
                     text-align: left;
                     margin-top: 20px;
 
                     h3 {
-                        font-size: 15px;
+                        font-size: 14px;
                         font-weight: 400;
                         letter-spacing: 1px;
                         color: $primary-font;
@@ -211,4 +212,5 @@ $accent: #412BEB;
             }
         }
     }
+
 }
