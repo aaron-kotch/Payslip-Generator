@@ -60,7 +60,7 @@ const PayrollView = () => {
         }
     }
 
-    const openGenerateDialog = () =>{
+    const openGenerateDialog = () => {
         setDialogOpen(true);
     }
 
@@ -124,7 +124,7 @@ const PayrollView = () => {
     }, []);
 
     return (
-        <SimpleBar className='payroll-view'>
+        <SimpleBar className={payrollList && payrollList.length ? 'payroll-view has-list' : 'payroll-view'}>
 
             <div className='title-row'>
                 <h1 className='title'>Payslip Generator</h1>

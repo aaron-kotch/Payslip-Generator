@@ -13,6 +13,7 @@ function createWindow() {
         height: 600,
         minWidth: 820,
         minHeight: 560,
+        title: "SOCC Payslip Generator",
         backgroundColor: '#FCFCFC',
         webPreferences: {
             nodeIntegration: true,
