@@ -1,46 +1,53 @@
 import './PayrollSectionItem.scss';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import useWindowDimensions from '../useWindowDimiension';
-import { FiChevronDown, FiHash } from 'react-icons/fi';
+import { FiDisc } from 'react-icons/fi';
 
-const PayrollSectionItem = ({data}) => {
+const PayrollSectionItem = ({data, index, currIndex}) => {
 
-    const { height, width } = useWindowDimensions();
+    const { width } = useWindowDimensions();
     const [ isOpen, setIsOpen ] = useState(false);
+
+    useEffect(() => {
+        
+        if (currIndex === index) {
+            setIsOpen(true)
+        } else {
+            setIsOpen(false)
+        }
+
+    }, [currIndex]);
     
     return(
 
         <div className='section-item'>
 
-            <div className='section-main' id={isOpen ? 'header-focus' : null}  onClick={() => {setIsOpen(!isOpen)}}>
+            <div className='section-main' id={isOpen ? 'header-focus' : null}>
 
                 <div className='name-section'>
-                    {/* <div className='icon-wrapper'>
-                        <FiHash/>
-                    </div> */}
+                    <h3>{isOpen}</h3>
                     <div className='name-wrapper'>
                         <h1>{data['name'].toLowerCase()}</h1>
+                        <h4>{data['position'].toLowerCase()}</h4>
                     </div>
                 </div>
                 
                 <div className='section-end'>
 
-                    { !isOpen && 
-                        <div className='inner-end'>
-                            <div className='pay-section'>
-                                <h2>RM {data['net-pay']}</h2>
-                                <h5>Net Pay</h5>
-                            </div>
+                    <div className='inner-end'>
+                        <div className='pay-section'>
+                            <h2 id='net-pay'>RM {data['net-pay']}</h2>
+                            <h5>Net Pay</h5>
                         </div>
-                    }
+                    </div>
 
                     <div className='expand-button'>
-                        <FiChevronDown id={isOpen ? 'button-isExpand' : 'button-isCollapsed'}/>
+                        <FiDisc id={isOpen ? 'button-isExpand' : 'button-isCollapsed'}/>
                     </div>
                 </div>
             </div>
 
-            { (isOpen && width < 1300) &&
+            { (isOpen && width < 1200) &&
                 <div className='section-data'>
 
                     <div className='item-section salary'>

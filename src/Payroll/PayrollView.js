@@ -5,12 +5,14 @@ import { useEffect, useState } from 'react';
 import useWindowDimensions from '../useWindowDimiension';
 import { FiRefreshCw, FiChevronRight, FiCheckCircle, FiX } from 'react-icons/fi';
 import { FcFolder } from 'react-icons/fc'
+import SimpleBar from 'simplebar-react';
+import 'simplebar/dist/simplebar.min.css'
 
 const { ipcRenderer } = window.require('electron');
 
 const PayrollView = () => {
 
-    const { height, width } = useWindowDimensions();
+    const { width } = useWindowDimensions();
     const [payrollList, setPayrollList] = useState([]);
     const [currentFile, setCurrentFile] = useState();
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -45,11 +47,7 @@ const PayrollView = () => {
     }
 
     async function viewFolder() {
-        const result = await ipcRenderer.invoke('view-folder', outputDir);
-
-        if (result !== undefined) {
-            setOutputDir(result)
-        }
+        await ipcRenderer.invoke('view-folder', outputDir);
     }
 
     async function getDefaultDir() {
@@ -87,7 +85,7 @@ const PayrollView = () => {
         const forLoop = async (item) => {
             for (const crew of item['data']) {
     
-                const result = await ipcRenderer.invoke('generate-payslip', {"data": crew, "filepath": outputDir, "month": item.month, "abv": item.abv});
+                await ipcRenderer.invoke('generate-payslip', {"data": crew, "filepath": outputDir, "month": item.month, "abv": item.abv});
     
                 currIndex += 1;
 
@@ -126,7 +124,7 @@ const PayrollView = () => {
     }, []);
 
     return (
-        <div className='payroll-view'>
+        <SimpleBar className='payroll-view'>
 
             <div className='title-row'>
                 <h1 className='title'>Payslip Generator</h1>
@@ -236,8 +234,14 @@ const PayrollView = () => {
 
                     { width > 1200 &&
                         <div className='large-summary'>
-
-                            <PayrollSummary item={payrollList[currentIndex]['data'][listIndex]}/>
+                            { listIndex!== null
+                                ? <PayrollSummary item={payrollList[currentIndex]['data'][listIndex]}/>
+                                : <div className='empty-summary'>
+                                    <img src='./images/gummy-printer.png'/>
+                                    <h2>No Item Selected</h2>
+                                    <p>Select an item from the list to preview</p>
+                                </div>
+                            }
                         </div> 
                        
                     }
@@ -258,7 +262,7 @@ const PayrollView = () => {
 
             }
             
-        </div>
+        </SimpleBar>
     );
 
 }

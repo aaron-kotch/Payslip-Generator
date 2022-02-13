@@ -1,17 +1,43 @@
 {
-  "name": "payroll-app",
-  "version": "0.1.0",
+  "name": "socc-payslip-generator",
+  "version": "0.0.1",
   "private": true,
+  "homepage": "./",
+  "author": "Aaron Sikua",
+  "description": "Pasylip Generator for SOCC OFFSHORE",
+  "build": {
+    "appId": "com.aaronkotch.soccgen",
+    "productName": "SOCC Payslip Generator",
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "public"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "deb"
+    }
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "cross-env": "^7.0.3",
+    "electronmon": "^2.0.2",
     "pdfkit": "^0.13.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-icons": "^4.3.1",
     "react-scripts": "5.0.0",
+    "react-uuid": "^1.0.2",
+    "simplebar-react": "^2.3.6",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.0"
   },
@@ -21,8 +47,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev": "concurrently -k \"cross-env BROWSER=none npm start\" \"npm:electron\"",
-    "electron": "wait-on tcp:3000 && electron ."
+    "electron:start": "concurrently -k \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electronmon .\"",
+    "electron:package:mac": "yarn build && electron-builder -m -c.extraMetadata.main=build/electron.js",
+    "electron:package:win": "yarn build && electron-builder -w -c.extraMetadata.main=build/electron.js",
+    "electron:package:linux": "yarn build && electron-builder -l -c.extraMetadata.main=build/electron.js"
   },
   "eslintConfig": {
     "extends": [
@@ -32,21 +60,19 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      "last 1 electron version"
     ],
     "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 electron version"
     ]
   },
   "devDependencies": {
     "concurrently": "^7.0.0",
     "electron": "^16.0.8",
-    "electron-is-dev": "^2.0.0",
+    "electron-builder": "^22.14.13",
     "sass": "^1.49.0",
     "wait-on": "^6.0.0"
   }
 }
+
+

@@ -1,13 +1,22 @@
 import './PayrollSection.scss';
 import PayrollSectionItem from './PayrollSectionItem';
-import { FiPlus } from 'react-icons/fi'
-import { useState } from 'react';
-
+import uuid from 'react-uuid';
+import { useEffect, useState } from 'react';
 
 const PayrollSection = ({data, handleIndex}) => {
 
+    const [activeIndex, setActiveIndex] = useState()
+
     const setCurrentIndex = (index) => {
-        handleIndex(index)
+
+        if (index !== activeIndex) {
+            handleIndex(index)
+            setActiveIndex(index)
+        } else {
+            handleIndex(null)
+            setActiveIndex(null)
+        }
+        
     }
 
     return (
@@ -34,8 +43,11 @@ const PayrollSection = ({data, handleIndex}) => {
             <div className='list-wrapper'>
                 { data['data'].length !== 0 &&
                     data['data'].map((item, index) => {
-                        return <div onClick={() => {setCurrentIndex(index)}}>
-                            <PayrollSectionItem key={item['name']} data={item}/>
+
+                        const id = uuid()
+
+                        return <div key={item['name']} onMouseUp={() => {setCurrentIndex(index)}}>
+                            <PayrollSectionItem data={item} index={index} currIndex={activeIndex}/>
                         </div>
                     })
                 }

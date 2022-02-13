@@ -1,6 +1,5 @@
 const fs = require('fs');
 const PDFGenerator = require('pdfkit')
-const homeDir = require('os').homedir()
 const path = require('path')
 
 class PaySlipGenerator {
@@ -15,7 +14,7 @@ class PaySlipGenerator {
     generateHeader(doc) {
 
         doc
-        .font('fonts/DejaVuSans-CondensedBold.ttf')
+        .font('Helvetica-Bold')
         .fontSize(10)
         .text("Company Name", 29, 19.2)
         .text(":  SOCC OFFSHORE SDN BHD", 130.6, 19.2)

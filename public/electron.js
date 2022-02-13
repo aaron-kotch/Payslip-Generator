@@ -1,12 +1,10 @@
 const path = require('path');
+const url = require("url")
 const reader = require('xlsx');
 const homedir = require('os').homedir();
 const fs = require('fs');
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
-const isDev = require('electron-is-dev');
 const PaySlipGenerator = require("./pdf/Payslip");
-const { execSync } = require('child_process');
-const { electron } = require('process');
 
 function createWindow() {
 
@@ -14,7 +12,7 @@ function createWindow() {
         width: 800,
         height: 600,
         minWidth: 820,
-        minHeight: 500,
+        minHeight: 560,
         backgroundColor: '#FCFCFC',
         webPreferences: {
             nodeIntegration: true,
@@ -22,17 +20,21 @@ function createWindow() {
         },
     });
 
-    win.loadURL(
-        isDev
-            ? 'http://localhost:3000'
-            : `file://${path.join(__dirname, '../build/index.html')}`
-    );
+    win.removeMenu();
 
-    if (isDev) {
+    const appURL = app.isPackaged
+    ? url.format({
+        pathname: path.join(__dirname, "index.html"),
+        protocol: "file:",
+        slashes: true,
+      })
+    : "http://localhost:3000";
+
+    win.loadURL(appURL);
+
+    if (!app.isPackaged) {
         win.webContents.openDevTools({ mode: 'detach' })
     }
-
-    win.removeMenu();
 
     ipcMain.handle('open-file', async() => {
 
@@ -321,3 +323,7 @@ function readFile(filepath) {
 
     return payrollList;
 }
+
+//OLD PACKAGE JSON
+// "dev": "concurrently -k \"cross-env BROWSER=none npm start\" \"npm:electron\"",
+// "electron": "wait-on tcp:3000 && electron .",
